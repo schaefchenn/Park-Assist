@@ -11,7 +11,8 @@ TaskHandle_t Task2;
 
 void CANBUS (void * pvParameters) {
 
-  sniffCAN();
+  CanRecieveMessage data = canReciever();
+  Serial.println(data.throttleValue);
 
   // yield
   vTaskDelay(1 / portTICK_PERIOD_MS);
@@ -31,6 +32,9 @@ void setup() {
   // Wait a moment to start (so we don't miss Serial output)
   vTaskDelay(1000 / portTICK_PERIOD_MS);
 
+  // Setup
+  canSetup();
+
   // Start CANcommunication (priority set to 1, 0 is the lowest priority)
   xTaskCreatePinnedToCore(CANBUS,                         // Function to be called
                           "Controller Area Network",      // Name of task
@@ -47,9 +51,8 @@ void setup() {
                           NULL,                           // Parameter to pass to function
                           2,                              // Increased priority
                           NULL,                           // Task handle
-                          app_cpu);                       // Assign to protocol core  
-}
+                          app_cpu);                       // Assign to protocol core 
 
-void loop() {
-  // put your main code here, to run repeatedly:
+  // Delete "setup and loop" task
+  vTaskDelete(NULL); 
 }
