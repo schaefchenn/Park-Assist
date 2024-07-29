@@ -26,6 +26,7 @@ struct CanRecieveMessage {
 
 void canSetup(){
     Serial.println("Initialize CAN...");
+
     // Set the pins for CAN communication
     CAN.setPins(RX_GPIO_NUM, TX_GPIO_NUM);
     
@@ -36,6 +37,28 @@ void canSetup(){
     } else {
         Serial.println("CAN Initialized");
     }
+}
+
+CanRecieveMessage canReciever() {
+  CanRecieveMessage recvMsg;
+  int packetSize = CAN.parsePacket();
+
+  if (packetSize) {
+    recvMsg.extended = CAN.packetExtended();
+    recvMsg.rtr = CAN.packetRtr();
+    recvMsg.id = CAN.packetId();
+    recvMsg.length = CAN.packetDlc();
+
+    // Read packet data into the struct
+    for (int i = 0; i < packetSize; i++) {
+      recvMsg.data[i] = CAN.read();
+    }
+
+    recvMsg.driverReady = recvMsg.data[0];
+    recvMsg.throttleValue = recvMsg.data[1];
+    Serial.println(recvMsg.throttleValue);
+  }
+  return recvMsg;
 }
 
 /*
