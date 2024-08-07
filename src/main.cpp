@@ -83,7 +83,7 @@ void ECU (void * pvParameters){
     driveMode = 0;
     throttle = 2000;
     steeringAngle = 60;
-    voltage = 1085; 
+    voltage = 1085;
     velocity = 60;
     acknowledged = 1;
 
