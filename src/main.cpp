@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <CANBUS.h>
+#include <MANEUVER.h>
 
 // Core definitions (assuming you have dual-core ESP32)
 static const BaseType_t pro_cpu = 0; // protocol core
@@ -91,69 +92,27 @@ void ECU (void * pvParameters){
   while(1){
     switch (canACKNOWLEDGED) {
       case 1:
-        driveMode = 0;
-        throttle = 1500;
-        steeringAngle = 150;
-        voltage = 0;
-        velocity = 0;
-        acknowledged = 0;
+        MANEUVER maneuver;
 
-        canSender(CANBUS_ID, driveMode, throttle, steeringAngle, voltage, velocity, acknowledged);
+        maneuver = fullLockRight();
+        canSender(CANBUS_ID, maneuver.driveMode, maneuver.throttle, maneuver.steeringAngle, maneuver.voltage, maneuver.velocity, maneuver.acknowledged);
+        vTaskDelay(1500 / portTICK_PERIOD_MS);
 
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        maneuver = reverse(maneuver.steeringAngle);
+        canSender(CANBUS_ID, maneuver.driveMode, maneuver.throttle, maneuver.steeringAngle, maneuver.voltage, maneuver.velocity, maneuver.acknowledged);
+        vTaskDelay(2100 / portTICK_PERIOD_MS);
 
-        driveMode = 0;
-        throttle = 1475;
-        steeringAngle = 150;
-        voltage = 0;
-        velocity = 0;
-        acknowledged = 0;
+        maneuver = fullLockLeft();
+        canSender(CANBUS_ID, maneuver.driveMode, maneuver.throttle, maneuver.steeringAngle, maneuver.voltage, maneuver.velocity, maneuver.acknowledged);
+        vTaskDelay(1500 / portTICK_PERIOD_MS);
 
-        canSender(CANBUS_ID, driveMode, throttle, steeringAngle, voltage, velocity, acknowledged);
+        maneuver = reverse(maneuver.steeringAngle);
+        canSender(CANBUS_ID, maneuver.driveMode, maneuver.throttle, maneuver.steeringAngle, maneuver.voltage, maneuver.velocity, maneuver.acknowledged);
+        vTaskDelay(2100 / portTICK_PERIOD_MS);
 
-        vTaskDelay(1622 / portTICK_PERIOD_MS);
+        maneuver = release();
+        canSender(CANBUS_ID, maneuver.driveMode, maneuver.throttle, maneuver.steeringAngle, maneuver.voltage, maneuver.velocity, maneuver.acknowledged);
 
-        driveMode = 0;
-        throttle = 1500;
-        steeringAngle = 30;
-        voltage = 0;
-        velocity = 0;
-        acknowledged = 0;
-
-        canSender(CANBUS_ID, driveMode, throttle, steeringAngle, voltage, velocity, acknowledged);
-
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-
-        driveMode = 0;
-        throttle = 1475;
-        steeringAngle = 30;
-        voltage = 0;
-        velocity = 0;
-        acknowledged = 0;
-
-        canSender(CANBUS_ID, driveMode, throttle, steeringAngle, voltage, velocity, acknowledged);
-
-        vTaskDelay(1622 / portTICK_PERIOD_MS);
-
-        driveMode = 0;
-        throttle = 1500;
-        steeringAngle = 90;
-        voltage = 0;
-        velocity = 0;
-        acknowledged = 0;
-
-        canSender(CANBUS_ID, driveMode, throttle, steeringAngle, voltage, velocity, acknowledged);
-
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-
-        driveMode = 1;
-        throttle = 1500;
-        steeringAngle = 90;
-        voltage = 0;
-        velocity = 0;
-        acknowledged = 0;
-
-        canSender(CANBUS_ID, driveMode, throttle, steeringAngle, voltage, velocity, acknowledged);
         canACKNOWLEDGED = 0;
 
         break;
@@ -178,8 +137,7 @@ void setup() {
   // Setup CAN communication and ECU Components
   setupCANBUS();
 
-  acknowledgedMutex = xSemaphoreCreateMutex();
-
+  // Start CAN communication (priority set to 1, 0 is the lowest priority)
   xTaskCreatePinnedToCore(CANBUS,                                       // Function to be called
                           "Controller Area Network Message Recieving",  // Name of task
                           8192,                                         // Increased stack size
@@ -188,7 +146,7 @@ void setup() {
                           NULL,                                         // Task handle
                           app_cpu);                                     // Assign to protocol core
 
-  // Start CANcommunication (priority set to 1, 0 is the lowest priority)
+  // Start ECU(priority set to 1, 0 is the lowest priority)
   xTaskCreatePinnedToCore(ECU,                            // Function to be called
                           "Electromic Controll Unit",      // Name of task
                           8192,                           // Increased stack size
