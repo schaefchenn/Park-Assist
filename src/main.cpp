@@ -9,8 +9,6 @@ static const BaseType_t app_cpu = 1; // application core
 // Initialize CPU cores
 TaskHandle_t Task1;
 TaskHandle_t Task2;
-
-SemaphoreHandle_t acknowledgedMutex; // Kloschlüssel
  
 // Set CAN ID
 #define CANBUS_ID 0x16    // put your CAN ID here
@@ -55,7 +53,7 @@ void CANBUS (void * pvParameters) {
 
       } else {
 
-
+        canDMODE = msg.driveMode;
         canACKNOWLEDGED = msg.acknowledged;
         canTHROTTLE = msg.throttle;
         canSTEERING = msg.steeringAngle;
@@ -101,6 +99,10 @@ void ECU (void * pvParameters){
         maneuver = reverse(maneuver.steeringAngle);
         canSender(CANBUS_ID, maneuver.driveMode, maneuver.throttle, maneuver.steeringAngle, maneuver.voltage, maneuver.velocity, maneuver.acknowledged);
         vTaskDelay(2100 / portTICK_PERIOD_MS);
+
+        maneuver = halt();
+        canSender(CANBUS_ID, maneuver.driveMode, maneuver.throttle, maneuver.steeringAngle, maneuver.voltage, maneuver.velocity, maneuver.acknowledged);
+        vTaskDelay(1500 / portTICK_PERIOD_MS);
 
         maneuver = fullLockLeft();
         canSender(CANBUS_ID, maneuver.driveMode, maneuver.throttle, maneuver.steeringAngle, maneuver.voltage, maneuver.velocity, maneuver.acknowledged);
@@ -153,9 +155,14 @@ void setup() {
                           NULL,                           // Parameter to pass to function
                           2,                              // Increased priority
                           NULL,                           // Task handle
-                          app_cpu);                       // Assign to protocol core  
+                          app_cpu);                       // Assign to protocol core
+
+  // Delete Setup Taks, it is not needed anymore 
+  vTaskDelete (NULL);
+
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  // Delete Loop Taks, it is not needed anymore
+  vTaskDelete (NULL);
 }

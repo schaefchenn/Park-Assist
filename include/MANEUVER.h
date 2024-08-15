@@ -53,6 +53,19 @@ MANEUVER reverse (uint8_t steeringAngle) {
   return maneuver;
 }
 
+MANEUVER halt () {
+  MANEUVER maneuver;
+    
+  maneuver.driveMode = 0;
+  maneuver.throttle = 1500;
+  maneuver.steeringAngle = 90;
+  maneuver.velocity = 0;
+  maneuver.voltage = 0;
+  maneuver.acknowledged = 0;
+
+  return maneuver;
+}
+
 MANEUVER release () {
   MANEUVER maneuver;
     
