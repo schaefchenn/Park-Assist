@@ -30,6 +30,7 @@ int16_t canVOLTAGE;
 int8_t canVELOCITY;
 int8_t canACKNOWLEDGED;
 
+
 //==================================================================================//
 
 void CANBUS (void * pvParameters) {
@@ -185,11 +186,11 @@ void setup() {
                           NULL,                                         // Parameter to pass to function
                           2,                                            // Increased priority
                           NULL,                                         // Task handle
-                          pro_cpu);                                     // Assign to protocol core
+                          app_cpu);                                     // Assign to protocol core
 
   // Start CANcommunication (priority set to 1, 0 is the lowest priority)
   xTaskCreatePinnedToCore(ECU,                            // Function to be called
-                          "Electromic Controll Uni",      // Name of task
+                          "Electromic Controll Unit",      // Name of task
                           8192,                           // Increased stack size
                           NULL,                           // Parameter to pass to function
                           2,                              // Increased priority
