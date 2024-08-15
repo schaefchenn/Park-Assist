@@ -1,10 +1,12 @@
+#include <Arduino.h>
+
 struct MANEUVER {
-  int8_t driveMode;
-  int16_t throttle;
-  uint8_t steeringAngle;
-  int8_t velocity;
-  int16_t voltage;
-  int8_t acknowledged;
+    int8_t driveMode;
+    int16_t throttle;
+    uint8_t steeringAngle;
+    int8_t velocity;
+    int16_t voltage;
+    int8_t acknowledged;
 };
 
 
