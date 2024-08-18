@@ -98,7 +98,7 @@ void ECU (void * pvParameters){
 
         maneuver = reverse(maneuver.steeringAngle);
         canSender(CANBUS_ID, maneuver.driveMode, maneuver.throttle, maneuver.steeringAngle, maneuver.voltage, maneuver.velocity, maneuver.acknowledged);
-        vTaskDelay(2100 / portTICK_PERIOD_MS);
+        vTaskDelay(2350 / portTICK_PERIOD_MS);
 
         maneuver = halt();
         canSender(CANBUS_ID, maneuver.driveMode, maneuver.throttle, maneuver.steeringAngle, maneuver.voltage, maneuver.velocity, maneuver.acknowledged);
@@ -110,7 +110,7 @@ void ECU (void * pvParameters){
 
         maneuver = reverse(maneuver.steeringAngle);
         canSender(CANBUS_ID, maneuver.driveMode, maneuver.throttle, maneuver.steeringAngle, maneuver.voltage, maneuver.velocity, maneuver.acknowledged);
-        vTaskDelay(2100 / portTICK_PERIOD_MS);
+        vTaskDelay(1900 / portTICK_PERIOD_MS);
 
         maneuver = release();
         canSender(CANBUS_ID, maneuver.driveMode, maneuver.throttle, maneuver.steeringAngle, maneuver.voltage, maneuver.velocity, maneuver.acknowledged);
